@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="d:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe" Date="1429736146"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -g -gl -gh -l -vewnhibq -FiL:\fp-pdf\fcl-pdf\examples\lib\x86_64-win64 -FuL:\fp-pdf\fcl-pdf\src -FuL:\fp-pdf\fcl-pdf\examples\ -FUL:\fp-pdf\fcl-pdf\examples\lib\x86_64-win64\ -FEL:\fp-pdf\fcl-pdf\examples\ -oL:\fp-pdf\fcl-pdf\examples\testfppdf.exe testfppdf.lpr"/>
+  <Complete Value="False"/>
+</CONFIG>
