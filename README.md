@@ -10,6 +10,6 @@ Also included are free pascal libs for images and jpegs (not all units of the li
 
 Since some PDF features are missing they may be added here.
 
-Known Bug: On Windows the drawing ccordinates have a problem.
+Known Bug: On Windows the drawing coordinates have a problem.
 
 
