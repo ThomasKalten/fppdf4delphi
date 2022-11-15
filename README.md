@@ -8,7 +8,9 @@ Therefor two helper units are implemented which hold the types used by FreePasca
 
 Also included are free pascal libs for images and jpegs (not all units of the libs are needed).
 
-Some units needed adaptions for compilation with Delphi.
+Some units needed adaptions for compilation with Delphi included renames from pp to pas file name extension.
+
+All the code is LGPL as the original code.
 
 Known Bug: 
 On Windows the drawing coordinates have a problem. 
