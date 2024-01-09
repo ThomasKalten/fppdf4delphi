@@ -5075,7 +5075,7 @@ var
     if UseUTF16 and not NoUnicode then
       IDict.AddString(aName,utf8decode(aValue))
     else
-      IDict.AddString(aName,aValue);  
+      IDict.AddString(aName,aValue);
   end;
 
 begin
