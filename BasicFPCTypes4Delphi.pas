@@ -5,21 +5,30 @@ Interface
 Uses Windows;
 {$ENDIF}
 
-type QWord = uint64;
+{$IF CompilerVersion > 20 }
+  {$LEGACYIFEND OFF}
+  {$DEFINE HASINLINE}
+{$IFEND}  
+
+type QWord = {$IF CompilerVersion > 20 } uint64 {$ELSE} int64 {$IFEND};
      PQWord = ^QWord;
      ValReal = Extended;
-     DWord = uint32;
+     DWord = {$IF CompilerVersion > 20 } uint32 {$ELSE} LongWord {$IFEND};
      TWordArray = Array[0..(maxint - 1) div sizeOf(Word) - 1] of word;
      PWordArray = ^TWordArray;
      TLongWordArray = Array[0..(maxint - 1) div sizeOf(LongWord) - 1] of LongWord;
      PLongWordArray = ^TLongWordArray;
 
+     {$IF CompilerVersion <= 20 }
+     SizeInt = Longint;
+     {$ELSE}
      {$IFDEF CPU32BITS}
      SizeInt = LongInt;
      {$ENDIF}
      {$IFDEF CPU64BITS}
      SizeInt = Int64;
      {$ENDIF}
+     {$IFEND}
 const
      FPC_FULLVERSION = 30399; // 30400 mit hat sich scheinbar einiges geändert
      {$IFDEF MSWINDOWS}
@@ -33,30 +42,38 @@ const
 
 procedure FillWord(var data; wordCount: integer; fillValue: word);
 function SetDirSeparators(const aPath: string): string;
+{$IF  CompilerVersion > 20}
 function GetLocalTimeOffset: integer;
+{$IFEND}
 function RPos(aCharToFind: char; const aString: string): integer;
 
 
-function SwapEndian(const AValue: SmallInt): SmallInt; inline; overload;
-function SwapEndian(const AValue: Word): Word; inline; overload;
-function SwapEndian(const AValue: LongInt): LongInt; inline; overload;
-function SwapEndian(const AValue: DWord): DWord; inline; overload;
+function SwapEndian(const AValue: SmallInt): SmallInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function SwapEndian(const AValue: Word): Word; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function SwapEndian(const AValue: LongInt): LongInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function SwapEndian(const AValue: DWord): DWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
 function SwapEndian(const AValue: Int64): Int64; overload;
+{$IF  CompilerVersion > 20}
 function SwapEndian(const AValue: QWord): QWord; overload;
+{$IFEND}
 
-function BEtoN(const AValue: SmallInt): SmallInt; inline; overload;
-function BEtoN(const AValue: Word): Word; inline; overload;
-function BEtoN(const AValue: LongInt): LongInt; inline; overload;
-function BEtoN(const AValue: DWord): DWord; inline; overload;
-function BEtoN(const AValue: Int64): Int64; inline; overload;
-function BEtoN(const AValue: QWord): QWord; inline; overload;
+function BEtoN(const AValue: SmallInt): SmallInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function BEtoN(const AValue: Word): Word; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function BEtoN(const AValue: LongInt): LongInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function BEtoN(const AValue: DWord): DWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function BEtoN(const AValue: Int64): Int64; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+{$IF  CompilerVersion > 20}
+function BEtoN(const AValue: QWord): QWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+{$IFEND}
 
-function NtoBE(const AValue: SmallInt): SmallInt; inline; overload;
-function NtoBE(const AValue: Word): Word; inline; overload;
-function NtoBE(const AValue: LongInt): LongInt; inline; overload;
-function NtoBE(const AValue: DWord): DWord; inline; overload;
-function NtoBE(const AValue: Int64): Int64; inline; overload;
-function NtoBE(const AValue: QWord): QWord; inline; overload;
+function NtoBE(const AValue: SmallInt): SmallInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function NtoBE(const AValue: Word): Word; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function NtoBE(const AValue: LongInt): LongInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function NtoBE(const AValue: DWord): DWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+function NtoBE(const AValue: Int64): Int64; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+{$IF  CompilerVersion > 20}
+function NtoBE(const AValue: QWord): QWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+{$IFEND}
 
 Implementation
 uses DateUtils, SysUtils;
@@ -75,17 +92,19 @@ begin
   result:= aPath; // Todo: check implementation
 end;
 
+{$IF  CompilerVersion > 20}
 function GetLocalTimeOffset: integer;
 begin
   result:= round(TTImeZone.Local.UtcOffset.TotalMinutes);
 end;
+{$IFEND}
 
 function RPos(aCharToFind: char; const aString: string): integer;
 begin
   result:= LastDelimiter(aCharToFind, aString);
 end;
 
-function SwapEndian(const AValue: SmallInt): SmallInt; inline; overload;
+function SwapEndian(const AValue: SmallInt): SmallInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     { the extra Word type cast is necessary because the "AValue shr 8" }
     { is turned into "longint(AValue) shr 8", so if AValue < 0 then    }
@@ -94,18 +113,18 @@ function SwapEndian(const AValue: SmallInt): SmallInt; inline; overload;
     Result := SmallInt(((Word(AValue) shr 8) or (Word(AValue) shl 8)) and $ffff);
   end;
 
-function SwapEndian(const AValue: Word): Word; inline; overload;
+function SwapEndian(const AValue: Word): Word; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     Result := ((AValue shr 8) or (AValue shl 8)) and $ffff;
   end;
 
-function SwapEndian(const AValue: LongInt): LongInt; inline; overload;
+function SwapEndian(const AValue: LongInt): LongInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     Result := ((AValue shl 8) and $FF00FF00) or ((AValue shr 8) and $00FF00FF);
     Result := (Result shl 16) or (Result shr 16);
   end;
 
-function SwapEndian(const AValue: DWord): DWord; inline; overload;
+function SwapEndian(const AValue: DWord): DWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     Result := ((AValue shl 8) and $FF00FF00) or ((AValue shr 8) and $00FF00FF);
     Result := (Result shl 16) or (Result shr 16);
@@ -120,6 +139,7 @@ function SwapEndian(const AValue: Int64): Int64; overload;
     Result := (Result shl 32) or ((Result shr 32));
   end;
 
+{$IF  CompilerVersion > 20}
 function SwapEndian(const AValue: QWord): QWord; overload;
   begin
     Result := ((AValue shl 8) and $FF00FF00FF00FF00) or
@@ -128,6 +148,7 @@ function SwapEndian(const AValue: QWord): QWord; overload;
             ((Result shr 16) and $0000FFFF0000FFFF);
     Result := (Result shl 32) or ((Result shr 32));
   end;
+{$IFEND}
 
 {$IFDEF CPUARM}
   {$undef ENDIAN_BIG}
@@ -139,7 +160,7 @@ function SwapEndian(const AValue: QWord): QWord; overload;
   {$undef ENDIAN_BIG}
 {$ENDIF}
 
-function BEtoN(const AValue: SmallInt): SmallInt; inline; overload;
+function BEtoN(const AValue: SmallInt): SmallInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -149,7 +170,7 @@ function BEtoN(const AValue: SmallInt): SmallInt; inline; overload;
   end;
 
 
-function BEtoN(const AValue: Word): Word; inline;
+function BEtoN(const AValue: Word): Word; {$IFDEF HASINLINE} inline; {$ENDIF} 
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -159,7 +180,7 @@ function BEtoN(const AValue: Word): Word; inline;
   end;
 
 
-function BEtoN(const AValue: LongInt): LongInt; inline;
+function BEtoN(const AValue: LongInt): LongInt; {$IFDEF HASINLINE} inline; {$ENDIF} 
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -169,7 +190,7 @@ function BEtoN(const AValue: LongInt): LongInt; inline;
   end;
 
 
-function BEtoN(const AValue: DWord): DWord; inline;
+function BEtoN(const AValue: DWord): DWord; {$IFDEF HASINLINE} inline; {$ENDIF} 
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -179,7 +200,7 @@ function BEtoN(const AValue: DWord): DWord; inline;
   end;
 
 
-function BEtoN(const AValue: Int64): Int64; inline;
+function BEtoN(const AValue: Int64): Int64; {$IFDEF HASINLINE} inline; {$ENDIF} 
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -188,6 +209,7 @@ function BEtoN(const AValue: Int64): Int64; inline;
     {$ENDIF}
   end;
 
+{$IF  CompilerVersion > 20}
 function BEtoN(const AValue: QWord): QWord; inline;
   begin
     {$IFDEF ENDIAN_BIG}
@@ -196,8 +218,9 @@ function BEtoN(const AValue: QWord): QWord; inline;
       Result := SwapEndian(AValue);
     {$ENDIF}
   end;
+{$IFEND}
 
-function NtoBE(const AValue: SmallInt): SmallInt; inline; overload;
+function NtoBE(const AValue: SmallInt): SmallInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -207,7 +230,7 @@ function NtoBE(const AValue: SmallInt): SmallInt; inline; overload;
   end;
 
 
-function NtoBE(const AValue: Word): Word; inline; overload;
+function NtoBE(const AValue: Word): Word; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -216,26 +239,7 @@ function NtoBE(const AValue: Word): Word; inline; overload;
     {$ENDIF}
   end;
 
-function NtoBE(const AValue: LongInt): LongInt; inline; overload;
-  begin
-    {$IFDEF ENDIAN_BIG}
-      Result := AValue;
-    {$ELSE}
-      Result := SwapEndian(AValue);
-    {$ENDIF}
-  end;
-
-
-function NtoBE(const AValue: DWord): DWord; inline; overload;
-  begin
-    {$IFDEF ENDIAN_BIG}
-      Result := AValue;
-    {$ELSE}
-      Result := SwapEndian(AValue);
-    {$ENDIF}
-  end;
-
-function NtoBE(const AValue: Int64): Int64; inline; overload;
+function NtoBE(const AValue: LongInt): LongInt; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -245,7 +249,7 @@ function NtoBE(const AValue: Int64): Int64; inline; overload;
   end;
 
 
-function NtoBE(const AValue: QWord): QWord; inline; overload;
+function NtoBE(const AValue: DWord): DWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
   begin
     {$IFDEF ENDIAN_BIG}
       Result := AValue;
@@ -254,6 +258,26 @@ function NtoBE(const AValue: QWord): QWord; inline; overload;
     {$ENDIF}
   end;
 
+function NtoBE(const AValue: Int64): Int64; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+  begin
+    {$IFDEF ENDIAN_BIG}
+      Result := AValue;
+    {$ELSE}
+      Result := SwapEndian(AValue);
+    {$ENDIF}
+  end;
+
+
+{$IF  CompilerVersion > 20}
+function NtoBE(const AValue: QWord): QWord; {$IFDEF HASINLINE} inline; {$ENDIF} overload;
+  begin
+    {$IFDEF ENDIAN_BIG}
+      Result := AValue;
+    {$ELSE}
+      Result := SwapEndian(AValue);
+    {$ENDIF}
+  end;
+{$IFEND}
 
 end.
 

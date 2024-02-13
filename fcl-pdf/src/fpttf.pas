@@ -22,7 +22,9 @@ unit fpTTF;
 {$IFDEF FPC}
   {$mode objfpc}{$h+}
 {$ELSE}
-  {$LEGACYIFEND OFF}
+ {$IF CompilerVersion > 20}
+   {$LEGACYIFEND OFF}
+ {$IFEND}
 {$ENDIF}
 
 {.$define ttfdebug}
@@ -410,6 +412,7 @@ begin
       else
       begin // we have a file
         if (lowercase(ExtractFileExt(s)) = '.ttf') or
+           (lowercase(ExtractFileExt(s)) = '.ttc') or
            (lowercase(ExtractFileExt(s)) = '.otf') then
         begin
           try
@@ -553,17 +556,17 @@ procedure TFPFontCacheList.ReadStandardFonts;
     w :  Array[0..MaxPathLen] of Char;
     {$ELSE}
     w : pwidechar;
-    {$ENDIF}
+    {$IFEND}
   begin
     {$if FPC_FULLVERSION < 30400}
     SHGetSpecialFolderPath(0,w,CSIDL_FONTS,false);
     {$else}
     SHGetKnownFolderPath(FOLDERID_Fonts,0,0,w);
-    {$endif}
+    {$ifend}
     Result := w;
     {$if FPC_FULLVERSION > 30400}
     CoTaskMemFree(w);
-    {$endif}
+    {$ifend}
   end;
 {$endif}
 

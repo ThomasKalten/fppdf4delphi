@@ -29,6 +29,17 @@ uses
   fpttfencodings;
 
 type
+  {$DEFINE HASINLINE}
+  {$IFNDEF FPC}
+   {$IF CompilerVersion <= 20}
+   Int16 = smallint;
+   Uint16 = word;
+   Int32 = Longint;
+   UInt32 = LongWord;
+   UnicodeString = string;
+   {$UNDEF HASINLINE}
+   {$IFEND}
+  {$ENDIF}
   ETTF = Class(Exception);
 
   // Tables recognized in this unit.
@@ -265,9 +276,9 @@ Type
     function GetMissingWidth: integer;
   Protected
     // Stream reading functions.
-    function ReadInt16(AStream: TStream): Int16; inline;
-    function ReadUInt32(AStream: TStream): UInt32; inline;
-    function ReadUInt16(AStream: TStream): UInt16; inline;
+    function ReadInt16(AStream: TStream): Int16; {$IFDEF HASINLINE} inline; {$ENDIF}
+    function ReadUInt32(AStream: TStream): UInt32; {$IFDEF HASINLINE} inline; {$ENDIF}
+    function ReadUInt16(AStream: TStream): UInt16; {$IFDEF HASINLINE} inline; {$ENDIF}
     // Parse the various well-known tables
     procedure ParseHead(AStream : TStream); virtual;
     procedure ParseHhea(AStream : TStream); virtual;
